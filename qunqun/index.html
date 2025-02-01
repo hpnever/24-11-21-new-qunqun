@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>向裙裙赞助</title>
+    <style>
+        body {
+            background-position: center;
+            background-size: cover;
+            background-color: #FFC0CB;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .layui-card {
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .layui-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .layui-badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .payment-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .card-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        /* 添加图片加载时的过渡效果 */
+        .modal-image {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal-image.loaded {
+            opacity: 1;
+        }
+        
+        /* 添加加载动画样式 */
+        .loading-spinner {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .notice-badge {
+            background-color: #ff5722;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .close-btn {
+            background-color: #1E9FFF;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .close-btn:hover {
+            background-color: #177ee6;
+        }
+    </style>
+</head>
+<body>
+<div style="display: none;" id="preloadContainer">
+    <img src="./wechat-payment.jpg" id="preload-wechat" loading="lazy">
+    <img src="./alipay-payment.jpg" id="preload-alipay" loading="lazy">
+    <img src="./wechat-reward.jpg" id="preload-wechat-reward" loading="lazy">
+    <img src="./qq-friend.jpg" id="preload-qq" loading="lazy">
+    <img src="./wechat-friend.jpg" id="preload-wechat-friend" loading="lazy">
+</div>
+
+<div class="layui-fluid">
+    <div class="page-header">
+        <h1>裙裙个人收款</h1>
+        <span class="notice-badge">赞助后请截图赞助结果发给裙裙</span>
+    </div>
+
+    <div class="payment-grid">
+        <!-- 微信收款码 -->
+        <div class="payment-card" id="wechatPayCard">
+            <div class="layui-card-header" style="color: #1aad19;">
+                <img src="./avatar.jpg" class="card-icon">
+                通过微信投喂裙裙
+            </div>
+            <div class="layui-card-body">
+                <h3>微信收款码</h3>
+                <p>点击打开二维码</p>
+            </div>
+        </div>
+
+        <!-- 微信赞赏码 -->
+        <div class="payment-card" id="wechatRewardCard">
+            <div class="layui-card-header" style="color: #d39e00;">
+                <img src="./avatar.jpg" class="card-icon">
+                通过微信投喂裙裙
+            </div>
+            <div class="layui-card-body">
+                <h3>微信赞赏码</h3>
+                <p>点击打开二维码</p>
+            </div>
+        </div>
+
+        <!-- 支付宝收款码 -->
+        <div class="payment-card" id="alipayCard">
+            <div class="layui-card-header" style="color: #00b3ee;">
+                <img src="./avatar.jpg" class="card-icon">
+                通过支付宝投喂裙裙
+            </div>
+            <div class="layui-card-body">
+                <h3>支付宝收款码</h3>
+                <p>点击打开二维码</p>
+            </div>
+        </div>
+
+        <!-- QQ好友码 -->
+        <div class="payment-card" id="qqFriendCard">
+            <div class="layui-card-header" style="color: #007bff;">
+                <img src="./avatar.jpg" class="card-icon">
+                通过QQ联系裙裙
+            </div>
+            <div class="layui-card-body">
+                <h3>QQ客服</h3>
+                <p>点击打开二维码</p>
+            </div>
+        </div>
+
+        <!-- 微信好友码 -->
+        <div class="payment-card" id="wechatFriendCard">
+            <div class="layui-card-header" style="color: #ff4444;">
+                <img src="./avatar.jpg" class="card-icon">
+                通过微信联系裙裙
+            </div>
+            <div class="layui-card-body">
+                <h3>微信客服</h3>
+                <p>点击打开二维码</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加模态框 -->
+    <div id="imageModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.3); max-width: 95vw; max-height: 95vh; text-align: center;">
+        <div class="loading-spinner"></div>
+        <img id="modalImage" class="modal-image" src="" alt="二维码" 
+            style="max-width: 300px; max-height: 300px; width: auto; height: auto; display: block; margin: 0 auto;"
+            role="img" aria-label="支付二维码">
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="close-btn" onclick="closeModal()" aria-label="关闭二维码">关闭</button>
+        </div>
+    </div>
+    <div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
+</div>
+
+<script>
+const imageCache = new Map();
+function preloadImages() {
+    const TIMEOUT = 10000; // 10秒超时
+    
+    const imagePaths = {
+        wechatPay: './wechat-payment.jpg',
+        alipay: './alipay-payment.jpg',
+        wechatReward: './wechat-reward.jpg',
+        qqFriend: './qq-friend.jpg',
+        wechatFriend: './wechat-friend.jpg'
+    };
+
+    const loadPromises = Object.entries(imagePaths).map(([key, path]) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            
+            const timeout = setTimeout(() => {
+                reject(new Error(`加载超时: ${key}`));
+            }, TIMEOUT);
+            
+            img.onload = () => {
+                clearTimeout(timeout);
+                imageCache.set(key, img);
+                console.log(`预加载完成: ${key}`);
+                resolve();
+            };
+            
+            img.onerror = () => {
+                clearTimeout(timeout);
+                console.error(`预加载失败: ${key}`);
+                reject(new Error(`加载失败: ${key}`));
+            };
+            
+            img.src = path;
+        });
+    });
+    
+    return Promise.all(loadPromises.map(p => p.catch(err => {
+        console.warn('图片加载警告:', err);
+        return null;
+    })));
+}
+
+function showImage(imageKey) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const spinner = document.querySelector('.loading-spinner');
+    const overlay = document.getElementById('overlay');
+    
+    modal.style.display = 'block';
+    overlay.style.display = 'block';
+    
+    if (imageCache.has(imageKey)) {
+        spinner.style.display = 'none';
+        modalImage.style.display = 'block';
+        modalImage.src = imageCache.get(imageKey).src;
+        setTimeout(() => modalImage.classList.add('loaded'), 50);
+    } else {
+        spinner.style.display = 'block';
+        modalImage.style.display = 'none';
+        modalImage.classList.remove('loaded');
+        
+        const imagePath = `./` + imageKey.replace(/([A-Z])/g, '-$1').toLowerCase() + '.jpg';
+        modalImage.src = imagePath;
+        
+        modalImage.onload = function() {
+            spinner.style.display = 'none';
+            modalImage.style.display = 'block';
+            setTimeout(() => modalImage.classList.add('loaded'), 50);
+            imageCache.set(imageKey, modalImage.cloneNode());
+        };
+        
+        modalImage.onerror = function() {
+            closeModal();
+        };
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    const overlay = document.getElementById('overlay');
+    const modalImage = document.getElementById('modalImage');
+    
+    modalImage.classList.remove('loaded');
+    modal.style.display = 'none';
+    overlay.style.display = 'none';
+}
+
+document.getElementById('wechatPayCard').addEventListener('click', function() {
+    showImage('wechatPay');
+});
+
+document.getElementById('alipayCard').addEventListener('click', function() {
+    showImage('alipay');
+});
+
+document.getElementById('wechatRewardCard').addEventListener('click', function() {
+    showImage('wechatReward');
+});
+
+document.getElementById('qqFriendCard').addEventListener('click', function() {
+    showImage('qqFriend');
+});
+
+document.getElementById('wechatFriendCard').addEventListener('click', function() {
+    showImage('wechatFriend');
+});
+
+document.getElementById('overlay').addEventListener('click', closeModal);
+
+document.addEventListener('DOMContentLoaded', function() {
+    preloadImages().then(() => {
+        console.log('图片预加载完成，网站准备就绪');
+    });
+});
+
+document.addEventListener('touchstart', function(e) {
+    if (e.target.id === 'overlay') {
+        closeModal();
+    }
+}, false);
+</script>
+</body>
+</html>
